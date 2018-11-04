@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cassert>
+#include <stdexcept>
 
 
 
@@ -9,6 +10,9 @@ public:
     enum RelationalOperators{
         LESS_THAN, GREATER_THAN, LESS_THAN_OR_EQUAL, GREATER_THAN_OR_EQUAL, EQUAL, NOT_EQUAL
     };
+    enum ArithmeticOperators{
+        ADD, SUBTRACT;
+    };
     friend std::ostream& operator<<(std::ostream& leftOS, const Fraction& rightOperand);
     friend bool operator<(const Fraction& leftOperand, const Fraction& rightOperand);
     friend bool operator>(const Fraction& leftOperand, const Fraction& rightOperand);
@@ -17,10 +21,15 @@ public:
     friend bool operator!=(const Fraction& leftOperand, const Fraction& rightOperand);
     friend bool operator==(const Fraction& leftOperand, const Fraction& rightOperand);
 
+    friend Fraction operator+(const Fraction& leftOperand, const Fraction& rightOperand);
+    friend Fraction operator-(const Fraction& leftOperand, const Fraction& rightOperand);
+    friend Fraction operator*(const Fraction& leftOperand, const Fraction& rightOperand);
+    friend Fraction operator/(const Fraction& leftOperand, const Fraction& rightOperand);
 private:
     int numerator;
     int denominator;
     friend bool compareFractions(const Fraction& leftOperand, const Fraction& rightOperand, RelationalOperators type);
+    friend Fraction addOrSubtract(const Fraction& leftOperand, const Fraction& rightOperand, ArithmeticOperators type);
 };
 
 
@@ -58,21 +67,21 @@ std::ostream& operator<<(std::ostream& leftOutput, const Fraction& rightOperand)
 
 
 bool compareFractions(const Fraction& leftOperand, const Fraction& rightOperand, Fraction::RelationalOperators type){
-    double leftReduced = leftOperand.numerator / leftOperand.denominator;
-    double rightReduced = rightOperand.numerator / rightOperand.denominator;
+    int leftProduct = leftOperand.numerator * rightOperand.denominator;
+    int rightProduct = leftOperand.denominator * rightOperand.numerator;
     switch(type){
         case Fraction::LESS_THAN:
-            return leftReduced < rightReduced;
+            return leftProduct < rightProduct;
         case Fraction::GREATER_THAN:
-            return leftReduced > rightReduced;
+            return leftProduct > rightProduct;
         case Fraction::LESS_THAN_OR_EQUAL:
-            return leftReduced <= rightReduced;
+            return leftProduct <= rightProduct;
         case Fraction::GREATER_THAN_OR_EQUAL:
-            return  leftReduced >= rightReduced;
+            return  leftProduct >= rightProduct;
         case Fraction::EQUAL:
-            return leftReduced == rightReduced;
+            return leftProduct == rightProduct;
         case Fraction::NOT_EQUAL:
-            return leftReduced != rightReduced;
+            return leftProduct != rightProduct;
     }
 }
 
@@ -129,6 +138,81 @@ bool operator!=(const Fraction& leftOperand, const Fraction& rightOperand){
 bool operator==(const Fraction& leftOperand, const Fraction& rightOperand){
     return compareFractions(leftOperand, rightOperand, Fraction::EQUAL);
 }
+
+
+
+
+//The four basic arithmetic operations (+, -, *, /)
+// should be supported.
+// Again, they should allow Fractions to be combined
+// with other Fractions, AS WELL AS WITH INTEGERS.
+// Either Fractions or integers can appear on either side
+// of the binary operator.
+//
+// Only use one function for each operator.
+
+//Don't go to a lot of trouble to find the common denominator
+// (when adding or subtracting).
+// Simply multiply the denominators together.
+Fraction addOrSubtract(const Fraction& leftOperand, const Fraction& rightOperand, Fraction::ArithmeticOperators type){
+    int leftNumerator = (leftOperand.numerator * rightOperand.denominator);
+    int rightNumerator = (rightOperand.numerator * leftOperand.denominator);
+    int newNumerator;
+    switch(type){
+        case Fraction::ADD:
+            newNumerator = leftNumerator + rightNumerator;
+            break;
+        case Fraction::SUBTRACT:
+            newNumerator = leftNumerator - rightNumerator;
+            break;
+        default:
+            throw std::invalid_argument("Invalid arithmetic operator type");
+    }
+    int newDenominator = leftOperand.denominator * rightOperand.denominator;
+    Fraction sum(newNumerator, newDenominator);
+    return sum;
+}
+
+
+
+
+Fraction operator+(const Fraction& leftOperand, const Fraction& rightOperand){
+    return addOrSubtract(leftOperand, rightOperand, Fraction::ADD);
+}
+
+
+
+
+
+
+Fraction operator-(const Fraction& leftOperand, const Fraction& rightOperand){
+    return addOrSubtract(leftOperand, rightOperand, Fraction::SUBTRACT);
+}
+
+
+
+
+
+
+Fraction operator*(const Fraction& leftOperand, const Fraction& rightOperand){
+    int newNumerator = leftOperand.numerator * rightOperand.numerator;
+    int newDenominator = leftOperand.denominator * rightOperand.denominator;
+    Fraction product(newNumerator, newDenominator);
+    return product;
+}
+
+Fraction operator/(const Fraction& leftOperand, const Fraction& rightOperand){
+    int newNumerator = leftOperand.numerator * rightOperand.denominator;
+    int newDenominator = leftOperand.denominator * rightOperand.numerator;
+    Fraction product(newNumerator, newDenominator);
+    return product;
+}
+
+
+
+
+
+
 
 
 
