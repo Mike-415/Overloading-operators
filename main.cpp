@@ -6,12 +6,24 @@
 class Fraction {
 public:
     Fraction( int inNumerator = 0, int inDenominator = 1);
+    enum RelationalOperators{
+        LESS_THAN, GREATER_THAN, LESS_THAN_OR_EQUAL, GREATER_THAN_OR_EQUAL, EQUAL, NOT_EQUAL
+    };
     friend std::ostream& operator<<(std::ostream& leftOS, const Fraction& rightOperand);
-    void print() const;
+    friend bool operator<(const Fraction& leftOperand, const Fraction& rightOperand);
+    friend bool operator>(const Fraction& leftOperand, const Fraction& rightOperand);
+    friend bool operator<=(const Fraction& leftOperand, const Fraction& rightOperand);
+    friend bool operator>=(const Fraction& leftOperand, const Fraction& rightOperand);
+    friend bool operator!=(const Fraction& leftOperand, const Fraction& rightOperand);
+    friend bool operator==(const Fraction& leftOperand, const Fraction& rightOperand);
+
 private:
     int numerator;
     int denominator;
+    friend bool compareFractions(const Fraction& leftOperand, const Fraction& rightOperand, RelationalOperators type);
 };
+
+
 
 
 
@@ -24,15 +36,104 @@ Fraction::Fraction( int inNumerator, int inDenominator){
 }
 
 
-void Fraction::print() const {
-    std::cout << numerator << "/" << denominator;
-}
+
+
+
 
 std::ostream& operator<<(std::ostream& leftOutput, const Fraction& rightOperand)
 {
     leftOutput << rightOperand.numerator << "/" << rightOperand.denominator;
     return leftOutput;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+bool compareFractions(const Fraction& leftOperand, const Fraction& rightOperand, Fraction::RelationalOperators type){
+    double leftReduced = leftOperand.numerator / leftOperand.denominator;
+    double rightReduced = rightOperand.numerator / rightOperand.denominator;
+    switch(type){
+        case Fraction::LESS_THAN:
+            return leftReduced < rightReduced;
+        case Fraction::GREATER_THAN:
+            return leftReduced > rightReduced;
+        case Fraction::LESS_THAN_OR_EQUAL:
+            return leftReduced <= rightReduced;
+        case Fraction::GREATER_THAN_OR_EQUAL:
+            return  leftReduced >= rightReduced;
+        case Fraction::EQUAL:
+            return leftReduced == rightReduced;
+        case Fraction::NOT_EQUAL:
+            return leftReduced != rightReduced;
+    }
+}
+
+
+
+
+
+
+bool operator<(const Fraction& leftOperand, const Fraction& rightOperand){
+    return compareFractions(leftOperand, rightOperand, Fraction::LESS_THAN);
+}
+
+
+
+
+
+
+bool operator>(const Fraction& leftOperand, const Fraction& rightOperand){
+    return compareFractions(leftOperand, rightOperand, Fraction::GREATER_THAN);
+}
+
+
+
+
+
+
+bool operator<=(const Fraction& leftOperand, const Fraction& rightOperand){
+    return compareFractions(leftOperand, rightOperand, Fraction::LESS_THAN_OR_EQUAL);
+}
+
+
+
+
+
+
+bool operator>=(const Fraction& leftOperand, const Fraction& rightOperand){
+    return compareFractions(leftOperand, rightOperand, Fraction::GREATER_THAN_OR_EQUAL);
+}
+
+
+
+
+
+
+bool operator!=(const Fraction& leftOperand, const Fraction& rightOperand){
+    return compareFractions(leftOperand, rightOperand, Fraction::NOT_EQUAL);
+}
+
+
+
+
+
+
+bool operator==(const Fraction& leftOperand, const Fraction& rightOperand){
+    return compareFractions(leftOperand, rightOperand, Fraction::EQUAL);
+}
+
+
+
+
+
 
 
 
@@ -45,6 +146,30 @@ int main() {
     std::cout << "f0: " << f0 << std::endl;
     std::cout << "f1: " << f1 << std::endl;
     std::cout << "f2: " << f2 << std::endl;
+
+    std::cout << "5/1 < 3/5: " << (f1 < f2) << std::endl;
+    std::cout << "3/5 < 3/5: " << (f2 < f2) << std::endl;
+    std::cout << "3/5 < 5/1: " << (f2 < f1) << std::endl << std::endl;
+
+    std::cout << "3/5 > 5/1: " << (f2 > f1) << std::endl;
+    std::cout << "3/5 > 3/5: " << (f2 > f2) << std::endl;
+    std::cout << "5/1 > 3/5: " << (f1 > f2) << std::endl << std::endl;
+
+    std::cout << "5/1 <= 3/5: " << (f1 <= f2) << std::endl;
+    std::cout << "3/5 <= 3/5: " << (f2 <= f2) << std::endl;
+    std::cout << "3/5 <= 5/1: " << (f2 <= f1) << std::endl << std::endl;
+
+    std::cout << "3/5 >= 5/1: " << (f2 >= f1) << std::endl;
+    std::cout << "3/5 >= 3/5: " << (f2 >= f2) << std::endl;
+    std::cout << "5/1 >= 3/5: " << (f1 >= f2) << std::endl << std::endl;
+
+    std::cout << "5/1 != 3/5: " << (f1 != f2) << std::endl;
+    std::cout << "3/5 != 3/5: " << (f2 != f2) << std::endl;
+    std::cout << "3/5 != 5/1: " << (f2 != f1) << std::endl << std::endl;
+
+    std::cout << "5/1 == 3/5: " << (f1 == f2) << std::endl;
+    std::cout << "3/5 == 3/5: " << (f2 == f2) << std::endl;
+    std::cout << "3/5 == 5/1: " << (f2 == f1) << std::endl << std::endl;
 
     return 0;
 }
