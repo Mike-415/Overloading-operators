@@ -6,6 +6,7 @@
 class Fraction {
 public:
     Fraction( int inNumerator = 0, int inDenominator = 1);
+    friend std::ostream& operator<<(std::ostream& leftOS, const Fraction& rightOperand);
     void print() const;
 private:
     int numerator;
@@ -27,6 +28,12 @@ void Fraction::print() const {
     std::cout << numerator << "/" << denominator;
 }
 
+std::ostream& operator<<(std::ostream& leftOutput, const Fraction& rightOperand)
+{
+    leftOutput << rightOperand.numerator << "/" << rightOperand.denominator;
+    return leftOutput;
+}
+
 
 
 
@@ -34,15 +41,11 @@ int main() {
     Fraction f0;
     Fraction f1(5);
     Fraction f2(3,5);
-    std::cout << "f0: ";
-    f0.print();
-    std::cout << std::endl;
-    std::cout << "f1: ";
-    f1.print();
-    std::cout << std::endl;
-    std::cout << "f2: ";
-    f2.print();
-    std::cout << std::endl;
+
+    std::cout << "f0: " << f0 << std::endl;
+    std::cout << "f1: " << f1 << std::endl;
+    std::cout << "f2: " << f2 << std::endl;
+
     return 0;
 }
 
