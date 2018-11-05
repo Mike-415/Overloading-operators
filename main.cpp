@@ -3,6 +3,7 @@
 #include <stdexcept>
 
 
+//TODO: Make sure the arithmetic operators work with integers too
 
 class Fraction {
 public:
@@ -11,7 +12,7 @@ public:
         LESS_THAN, GREATER_THAN, LESS_THAN_OR_EQUAL, GREATER_THAN_OR_EQUAL, EQUAL, NOT_EQUAL
     };
     enum ArithmeticOperators{
-        ADD, SUBTRACT;
+        ADD, SUBTRACT
     };
     friend std::ostream& operator<<(std::ostream& leftOS, const Fraction& rightOperand);
     friend bool operator<(const Fraction& leftOperand, const Fraction& rightOperand);
@@ -25,6 +26,9 @@ public:
     friend Fraction operator-(const Fraction& leftOperand, const Fraction& rightOperand);
     friend Fraction operator*(const Fraction& leftOperand, const Fraction& rightOperand);
     friend Fraction operator/(const Fraction& leftOperand, const Fraction& rightOperand);
+
+    Fraction operator++();
+    Fraction operator++(int);
 private:
     int numerator;
     int denominator;
@@ -211,8 +215,26 @@ Fraction operator/(const Fraction& leftOperand, const Fraction& rightOperand){
 
 
 
+// To increment or decrement a Fraction
+// means to add or subtract (respectively) one (1)
+// 1/1 + fraction
+Fraction Fraction::operator++(){
+    Fraction one(1,1);
+    return addOrSubtract(one, *this, Fraction::ADD);
+}
 
 
+
+
+
+
+Fraction Fraction::operator++(int){
+    Fraction temp(numerator, denominator), one(1,1) , incrementedFraction;
+    incrementedFraction = addOrSubtract(one, *this, Fraction::ADD);
+    denominator = incrementedFraction.denominator;
+    numerator = incrementedFraction.numerator;
+    return temp;
+}
 
 
 
@@ -254,6 +276,14 @@ int main() {
     std::cout << "5/1 == 3/5: " << (f1 == f2) << std::endl;
     std::cout << "3/5 == 3/5: " << (f2 == f2) << std::endl;
     std::cout << "3/5 == 5/1: " << (f2 == f1) << std::endl << std::endl;
+
+    std::cout << "5/1 + 3/5: " << (f1 + f2) << std::endl;
+    std::cout << "3/5 + 3/5: " << (f2 + f2) << std::endl;
+    std::cout << "3/5 + 5/1: " << (f2 + f1) << std::endl << std::endl;
+
+    std::cout << "++3/5 " << (++f2) << std::endl << std::endl;
+    //REMEMBER: The last statements change the value of 'f1'
+
 
     return 0;
 }
