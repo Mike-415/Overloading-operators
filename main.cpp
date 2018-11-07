@@ -1,9 +1,8 @@
 #include <iostream>
 #include <cassert>
 #include <stdexcept>
-
-
-//TODO: Make sure the arithmetic operators work with integers too
+#include <string>
+using namespace std;
 
 class Fraction {
 public:
@@ -27,8 +26,15 @@ public:
     friend Fraction operator*(const Fraction& leftOperand, const Fraction& rightOperand);
     friend Fraction operator/(const Fraction& leftOperand, const Fraction& rightOperand);
 
+    Fraction operator+=(const Fraction& rightOperand);
+    Fraction operator-=(const Fraction& rightOperand);
+    Fraction operator*=(const Fraction& rightOperand);
+    Fraction operator/=(const Fraction& rightOperand);
+
     Fraction operator++();
     Fraction operator++(int);
+    Fraction operator--();
+    Fraction operator--(int);
 private:
     int numerator;
     int denominator;
@@ -53,8 +59,7 @@ Fraction::Fraction( int inNumerator, int inDenominator){
 
 
 
-std::ostream& operator<<(std::ostream& leftOutput, const Fraction& rightOperand)
-{
+std::ostream& operator<<(std::ostream& leftOutput, const Fraction& rightOperand) {
     leftOutput << rightOperand.numerator << "/" << rightOperand.denominator;
     return leftOutput;
 }
@@ -146,18 +151,8 @@ bool operator==(const Fraction& leftOperand, const Fraction& rightOperand){
 
 
 
-//The four basic arithmetic operations (+, -, *, /)
-// should be supported.
-// Again, they should allow Fractions to be combined
-// with other Fractions, AS WELL AS WITH INTEGERS.
-// Either Fractions or integers can appear on either side
-// of the binary operator.
-//
-// Only use one function for each operator.
 
-//Don't go to a lot of trouble to find the common denominator
-// (when adding or subtracting).
-// Simply multiply the denominators together.
+
 Fraction addOrSubtract(const Fraction& leftOperand, const Fraction& rightOperand, Fraction::ArithmeticOperators type){
     int leftNumerator = (leftOperand.numerator * rightOperand.denominator);
     int rightNumerator = (rightOperand.numerator * leftOperand.denominator);
@@ -205,22 +200,72 @@ Fraction operator*(const Fraction& leftOperand, const Fraction& rightOperand){
     return product;
 }
 
+
+
+
+
+
 Fraction operator/(const Fraction& leftOperand, const Fraction& rightOperand){
     int newNumerator = leftOperand.numerator * rightOperand.denominator;
     int newDenominator = leftOperand.denominator * rightOperand.numerator;
-    Fraction product(newNumerator, newDenominator);
-    return product;
+    Fraction quotient(newNumerator, newDenominator);
+    return quotient;
 }
 
 
 
 
-// To increment or decrement a Fraction
-// means to add or subtract (respectively) one (1)
-// 1/1 + fraction
+
+
+Fraction Fraction::operator+=(const Fraction& rightOperand){
+
+    *this = *this + rightOperand;
+    return *this;
+}
+
+
+
+
+
+
+Fraction Fraction::operator-=(const Fraction& rightOperand){
+
+    *this = *this - rightOperand;
+    return *this;
+}
+
+
+
+
+
+
+Fraction Fraction::operator*=(const Fraction& rightOperand){
+
+    *this = *this * rightOperand;
+    return *this;
+}
+
+
+
+
+
+
+Fraction Fraction::operator/=(const Fraction& rightOperand){
+
+    *this = *this / rightOperand;
+    return *this;
+}
+
+
+
+
+
+
+
 Fraction Fraction::operator++(){
-    Fraction one(1,1);
-    return addOrSubtract(one, *this, Fraction::ADD);
+    Fraction one(1);
+    *this =  addOrSubtract(*this, one, Fraction::ADD);
+    return *this;
 }
 
 
@@ -229,8 +274,8 @@ Fraction Fraction::operator++(){
 
 
 Fraction Fraction::operator++(int){
-    Fraction temp(numerator, denominator), one(1,1) , incrementedFraction;
-    incrementedFraction = addOrSubtract(one, *this, Fraction::ADD);
+    Fraction temp(numerator, denominator), one(1), incrementedFraction;
+    incrementedFraction = addOrSubtract(*this, one, Fraction::ADD);
     denominator = incrementedFraction.denominator;
     numerator = incrementedFraction.numerator;
     return temp;
@@ -242,107 +287,330 @@ Fraction Fraction::operator++(int){
 
 
 
+Fraction Fraction::operator--(){
+    Fraction one(1,1);
+    *this = addOrSubtract(*this, one, Fraction::SUBTRACT);
+    return *this;
+}
 
 
-int main() {
-    Fraction f0;
-    Fraction f1(5);
-    Fraction f2(3,5);
-
-    std::cout << "f0: " << f0 << std::endl;
-    std::cout << "f1: " << f1 << std::endl;
-    std::cout << "f2: " << f2 << std::endl;
-
-    std::cout << "5/1 < 3/5: " << (f1 < f2) << std::endl;
-    std::cout << "3/5 < 3/5: " << (f2 < f2) << std::endl;
-    std::cout << "3/5 < 5/1: " << (f2 < f1) << std::endl << std::endl;
-
-    std::cout << "3/5 > 5/1: " << (f2 > f1) << std::endl;
-    std::cout << "3/5 > 3/5: " << (f2 > f2) << std::endl;
-    std::cout << "5/1 > 3/5: " << (f1 > f2) << std::endl << std::endl;
-
-    std::cout << "5/1 <= 3/5: " << (f1 <= f2) << std::endl;
-    std::cout << "3/5 <= 3/5: " << (f2 <= f2) << std::endl;
-    std::cout << "3/5 <= 5/1: " << (f2 <= f1) << std::endl << std::endl;
-
-    std::cout << "3/5 >= 5/1: " << (f2 >= f1) << std::endl;
-    std::cout << "3/5 >= 3/5: " << (f2 >= f2) << std::endl;
-    std::cout << "5/1 >= 3/5: " << (f1 >= f2) << std::endl << std::endl;
-
-    std::cout << "5/1 != 3/5: " << (f1 != f2) << std::endl;
-    std::cout << "3/5 != 3/5: " << (f2 != f2) << std::endl;
-    std::cout << "3/5 != 5/1: " << (f2 != f1) << std::endl << std::endl;
-
-    std::cout << "5/1 == 3/5: " << (f1 == f2) << std::endl;
-    std::cout << "3/5 == 3/5: " << (f2 == f2) << std::endl;
-    std::cout << "3/5 == 5/1: " << (f2 == f1) << std::endl << std::endl;
-
-    std::cout << "5/1 + 3/5: " << (f1 + f2) << std::endl;
-    std::cout << "3/5 + 3/5: " << (f2 + f2) << std::endl;
-    std::cout << "3/5 + 5/1: " << (f2 + f1) << std::endl << std::endl;
-
-    std::cout << "++3/5 " << (++f2) << std::endl << std::endl;
-    //REMEMBER: The last statements change the value of 'f1'
 
 
-    return 0;
+
+
+Fraction Fraction::operator--(int){
+    Fraction temp(numerator, denominator), one(1) , decrementedFraction;
+    decrementedFraction = addOrSubtract(*this, one, Fraction::SUBTRACT);
+    denominator = decrementedFraction.denominator;
+    numerator = decrementedFraction.numerator;
+    return temp;
+}
+
+
+
+
+
+
+void BasicTest();
+void RelationTest();
+void BinaryMathTest();
+void MathAssignTest();
+string boolString(bool convertMe);
+
+
+
+
+
+
+
+int main()
+{
+    BasicTest();
+    RelationTest();
+    BinaryMathTest();
+    MathAssignTest();
+}
+
+
+
+
+
+
+void BasicTest()
+{
+    cout << "\n----- Testing basic Fraction creation & printing\n";
+
+    const Fraction fr[] = {Fraction(4, 8), Fraction(-15,21),
+                           Fraction(10), Fraction(12, -3),
+                           Fraction(), Fraction(28, 6), Fraction(0, 12)};
+
+    for (int i = 0; i < 7; i++){
+        cout << "Fraction [" << i <<"] = " << fr[i] << endl;
+    }
+}
+
+
+
+
+
+
+string boolString(bool convertMe) {
+    if (convertMe) {
+        return "true";
+    } else {
+        return "false";
+    }
+}
+
+
+
+
+
+
+void RelationTest()
+{
+    cout << "\n----- Testing relational operators between Fractions\n";
+
+    const Fraction fr[] =  {Fraction(3, 6), Fraction(1,2), Fraction(-15,30),
+                            Fraction(1,10), Fraction(0,1), Fraction(0,2)};
+
+    for (int i = 0; i < 5; i++) {
+        cout << "Comparing " << fr[i] << " to " << fr[i+1] << endl;
+        cout << "\tIs left < right? " << boolString(fr[i] < fr[i+1]) << endl;
+        cout << "\tIs left <= right? " << boolString(fr[i] <= fr[i+1]) << endl;
+        cout << "\tIs left > right? " << boolString(fr[i] > fr[i+1]) << endl;
+        cout << "\tIs left >= right? " << boolString(fr[i] >= fr[i+1]) << endl;
+        cout << "\tDoes left == right? " << boolString(fr[i] == fr[i+1]) << endl;
+        cout << "\tDoes left != right ? " << boolString(fr[i] != fr[i+1]) << endl;
+    }
+
+    cout << "\n----- Testing relations between Fractions and integers\n";
+    Fraction f(-3,6);
+    int num = 2;
+    cout << "Comparing " << f << " to " << num << endl;
+    cout << "\tIs left < right? " << boolString(f < num) << endl;
+    cout << "\tIs left <= right? " << boolString(f <= num) << endl;
+    cout << "\tIs left > right? " << boolString(f > num) << endl;
+    cout << "\tIs left >= right? " << boolString(f >= num) << endl;
+    cout << "\tDoes left == right? " << boolString(f == num) << endl;
+    cout << "\tDoes left != right ? " << boolString(f != num) << endl;
+
+    Fraction g(1,4);
+    num = -3;
+    cout << "Comparing " << num << " to " << g << endl;
+    cout << "\tIs left < right? " << boolString(num < g) << endl;
+    cout << "\tIs left <= right? " << boolString(num <= g) << endl;
+    cout << "\tIs left > right? " << boolString(num > g) << endl;
+    cout << "\tIs left >= right? " << boolString(num >= g) << endl;
+    cout << "\tDoes left == right? " << boolString(num == g) << endl;
+    cout << "\tDoes left != right ? " << boolString(num != g) << endl;
+}
+
+
+
+
+
+
+void BinaryMathTest()
+{
+    cout << "\n----- Testing binary arithmetic between Fractions\n";
+
+    const Fraction fr[] = {Fraction(1, 6), Fraction(1,3),
+                           Fraction(-2,3), Fraction(5), Fraction(-4,3)};
+
+    for (int i = 0; i < 4; i++) {
+        cout << fr[i] << " + " << fr[i+1] << " = " << fr[i] + fr[i+1] << endl;
+        cout << fr[i] << " - " << fr[i+1] << " = " << fr[i] - fr[i+1] << endl;
+        cout << fr[i] << " * " << fr[i+1] << " = " << fr[i] * fr[i+1] << endl;
+        cout << fr[i] << " / " << fr[i+1] << " = " << fr[i] / fr[i+1] << endl;
+    }
+
+    cout << "\n----- Testing arithmetic between Fractions and integers\n";
+    Fraction f(-1, 2);
+    int num = 4;
+    cout << f << " + " << num << " = " << f + num << endl;
+    cout << f << " - " << num << " = " << f - num << endl;
+    cout << f << " * " << num << " = " << f * num << endl;
+    cout << f << " / " << num << " = " << f / num << endl;
+
+    Fraction g(-1, 2);
+    num = 3;
+    cout << num << " + " << g << " = " << num + g << endl;
+    cout << num << " - " << g << " = " << num - g << endl;
+    cout << num << " * " << g << " = " << num * g << endl;
+    cout << num << " / " << g << " = " << num / g << endl;
+}
+
+
+
+
+
+
+void MathAssignTest()
+{
+    cout << "\n----- Testing shorthand arithmetic assignment on Fractions\n";
+
+    Fraction fr[] = {Fraction(1, 6), Fraction(4),
+                     Fraction(-1,2), Fraction(5)};
+
+    for (int i = 0; i < 3; i++) {
+        cout << fr[i] << " += " << fr[i+1] << " = ";
+        cout << (fr[i] += fr[i+1]) << endl;
+        cout << fr[i] << " -= " << fr[i+1] << " = ";
+        cout << (fr[i] -= fr[i+1]) << endl;
+        cout << fr[i] << " *= " << fr[i+1] << " = ";
+        cout << (fr[i] *= fr[i+1]) << endl;
+        cout << fr[i] << " /= " << fr[i+1] << " = ";
+        cout << (fr[i] /= fr[i+1]) << endl;
+    }
+
+    cout << "\n----- Testing shorthand arithmetic assignment using integers\n";
+    Fraction f(-1, 3);
+    int num = 3;
+    cout << f << " += " << num << " = ";
+    cout << (f += num) << endl;
+    cout << f << " -= " << num << " = ";
+    cout << (f -= num) << endl;
+    cout << f << " *= " << num << " = ";
+    cout << (f *= num) << endl;
+    cout << f << " /= " << num << " = ";
+    cout << (f /= num) << endl;
+
+    cout << "\n----- Testing increment/decrement prefix and postfix\n";
+    Fraction g(-1, 3);
+    cout << "Now g = " << g << endl;
+    cout << "g++ = " << g++ << endl;
+    cout << "Now g = " << g << endl;
+    cout << "++g = " << ++g << endl;
+    cout << "Now g = " << g << endl;
+    cout << "g-- = " << g-- << endl;
+    cout << "Now g = " << g << endl;
+    cout << "--g = " << --g << endl;
+    cout << "Now g = " << g << endl;
 }
 
 /*
+OUTPUT:
 
-Learning Objectives
-After the successful completion of this learning unit, you will be able to:
+----- Testing basic Fraction creation & printing
+Fraction [0] = 4/8
+Fraction [1] = -15/21
+Fraction [2] = 10/1
+Fraction [3] = 12/-3
+Fraction [4] = 0/1
+Fraction [5] = 28/6
+Fraction [6] = 0/12
 
-Define syntactically correct overloaded operators in accordance with good programming practice
-Implement friend functions
-Assignment 11.1 [45 points]
-For this assignment you will be building on your Fraction class. However, the changes will be significant, so I would recommend starting from scratch and using your previous version as a resource when appropriate. You'll continue working on your Fraction class for one more week, next week. For this week you are not required to provide documentation and not required to simplify Fractions.
+----- Testing relational operators between Fractions
+Comparing 3/6 to 1/2
+	Is left < right? false
+	Is left <= right? true
+	Is left > right? false
+	Is left >= right? true
+	Does left == right? true
+	Does left != right ? false
+Comparing 1/2 to -15/30
+	Is left < right? false
+	Is left <= right? false
+	Is left > right? true
+	Is left >= right? true
+	Does left == right? false
+	Does left != right ? true
+Comparing -15/30 to 1/10
+	Is left < right? true
+	Is left <= right? true
+	Is left > right? false
+	Is left >= right? false
+	Does left == right? false
+	Does left != right ? true
+Comparing 1/10 to 0/1
+	Is left < right? false
+	Is left <= right? false
+	Is left > right? true
+	Is left >= right? true
+	Does left == right? false
+	Does left != right ? true
+Comparing 0/1 to 0/2
+	Is left < right? false
+	Is left <= right? true
+	Is left > right? false
+	Is left >= right? true
+	Does left == right? true
+	Does left != right ? false
 
-Please keep all of your code in one file for this week. We will separate things into three files for the next assignment. Your class will go first, then your class member function definitions, then main().
+----- Testing relations between Fractions and integers
+Comparing -3/6 to 2
+	Is left < right? true
+	Is left <= right? true
+	Is left > right? false
+	Is left >= right? false
+	Does left == right? false
+	Does left != right ? true
+Comparing -3 to 1/4
+	Is left < right? true
+	Is left <= right? true
+	Is left > right? false
+	Is left >= right? false
+	Does left == right? false
+	Does left != right ? true
 
-Here are the client program and correct output.
+----- Testing binary arithmetic between Fractions
+1/6 + 1/3 = 9/18
+1/6 - 1/3 = -3/18
+1/6 * 1/3 = 1/18
+1/6 / 1/3 = 3/6
+1/3 + -2/3 = -3/9
+1/3 - -2/3 = 9/9
+1/3 * -2/3 = -2/9
+1/3 / -2/3 = 3/-6
+-2/3 + 5/1 = 13/3
+-2/3 - 5/1 = -17/3
+-2/3 * 5/1 = -10/3
+-2/3 / 5/1 = -2/15
+5/1 + -4/3 = 11/3
+5/1 - -4/3 = 19/3
+5/1 * -4/3 = -20/3
+5/1 / -4/3 = 15/-4
 
-Your class should support the following operations on Fraction objects:
+----- Testing arithmetic between Fractions and integers
+-1/2 + 4 = 7/2
+-1/2 - 4 = -9/2
+-1/2 * 4 = -4/2
+-1/2 / 4 = -1/8
+3 + -1/2 = 5/2
+3 - -1/2 = 7/2
+3 * -1/2 = -3/2
+3 / -1/2 = 6/-1
 
-Construction of a Fraction from two, one, or zero integer arguments. If two arguments, they are assumed to be the numerator and denominator, just one is assumed to be a whole number, and zero arguments creates a zero Fraction. Use default parameters so that you only need a single function to implement all three of these constructors.
+----- Testing shorthand arithmetic assignment on Fractions
+1/6 += 4/1 = 25/6
+25/6 -= 4/1 = 1/6
+1/6 *= 4/1 = 4/6
+4/6 /= 4/1 = 4/24
+4/1 += -1/2 = 7/2
+7/2 -= -1/2 = 16/4
+16/4 *= -1/2 = -16/8
+-16/8 /= -1/2 = -32/-8
+-1/2 += 5/1 = 9/2
+9/2 -= 5/1 = -1/2
+-1/2 *= 5/1 = -5/2
+-5/2 /= 5/1 = -5/10
 
-You should check to make sure that the denominator is not set to 0. The easiest way to do this is to use an assert statement: assert(inDenominator != 0); You can put this statement at the top of your constructor. Note that the variable in the assert() is the incoming parameter, not the data member. In order to use assert(), you must #include <cassert>
+----- Testing shorthand arithmetic assignment using integers
+-1/3 += 3 = 8/3
+8/3 -= 3 = -1/3
+-1/3 *= 3 = -3/3
+-3/3 /= 3 = -3/9
 
-For this assignment, you may assume that all Fractions are positive. We'll fix that next week.
-
-Printing a Fraction to a stream with an overloaded << operator. Next week we will get fancy with this, but for now just print the numerator, a forward-slash, and the denominator. No need to change improper Fractions to mixed numbers, and no need to reduce.
-
-All six of the relational operators (<, <=, >, >=, ==, !=) should be supported. They should be able to compare Fractions to other Fractions as well as Fractions to integers. Either Fractions or integers can appear on either side of the binary comparison operator. You should only use one function for each operator.
-
-The four basic arithmetic operations (+, -, *, /) should be supported. Again, they should allow Fractions to be combined with other Fractions, as well as with integers. Either Fractions or integers can appear on either side of the binary operator. Only use one function for each operator.
-
-Note that no special handling is needed to handle the case of dividing by a Fraction that is equal to 0. If the client attempts to do this, they will get a runtime error, which is the same behavior they would expect if they tried to divide by an int or double that was equal to 0.
-
-The shorthand arithmetic assignment operators (+=, -=, *=, /=) should also be implemented. Fractions can appear on the left-hand side, and Fractions or integers on the right-hand side.
-
-The increment and decrement (++, --) operators should be supported in both prefix and postfix form for Fractions. To increment or decrement a Fraction means to add or subtract (respectively) one (1).
-
-Additional Requirements and Hints:
-You will not be graded on documentation on this assignment. You'll be working on the documentation next week.
-The name of your class must be "Fraction". No variations will work.
-Use exactly two data members.
-You should not compare two Fractions by dividing the numerator by the denominator. This is not guaranteed to give you the correct result every time, because of the way that double values are stored internally by the computer. I would cross multiply and compare the products.
-Don't go to a lot of trouble to find the common denominator (when adding or subtracting). Simply multiply the denominators together.
-The last two bullets bring up an interesting issue: if your denominators are really big, multiplying them together (or cross multiplying) may give you a number that is too big to store in an int variable. This is called overflow. The rule for this assignment is: don't worry about overflow in these two situations.
-My solution has 20 member functions (including friend functions). All of them are less than 4 lines long. I'm not saying yours has to be like this, but it shouldn't be way off.
-Do not use as a resource a supplementary text or website if it includes a Fraction class (or rational or ratio or whatever).
-Getting Started
-Here are some suggestions for those of you who have trouble just figuring out where to start with assignment 1. Remember to use iterative development. That means start with the smallest, simplest subset of the final product that you can, make sure it works, and then start adding things to it one at a time (preferably the simple things first, if possible).
-
-Start with just a default constructor and a stream insertion operator. For now, don't even worry about mixed numbers, just write the stream insertion operator so that it works with proper fractions. Test this out with a client program something like this:
-
-int main(){
-	Fraction f1;
-
-	cout << f1;
-}
-(You should get output of "0/1" because you should have initialized the fraction to 0/1 in your constructor.)
-
-If you have trouble getting this far, be sure to let me know ASAP so I can help!
+----- Testing increment/decrement prefix and postfix
+Now g = -1/3
+g++ = -1/3
+Now g = 2/3
+++g = 5/3
+Now g = 5/3
+g-- = 5/3
+Now g = 2/3
+--g = -1/3
+Now g = -1/3
 
  */
