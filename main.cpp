@@ -61,8 +61,28 @@ Fraction::Fraction( int inNumerator, int inDenominator){
 
 
 
+/*
+Now modify your overloaded << operator so that improper Fractions
+are printed as mixed numbers. Whole numbers should print without a denominator
+(e.g. not 3/1 but just 3).
+
+Improper Fractions should be printed as a mixed number with a + sign
+between the two parts (2+1/2). Negative Fractions should be printed
+with a leading minus sign.
+
+
+
+ */
 std::ostream& operator<<(std::ostream& leftOutput, const Fraction& rightOperand) {
-    leftOutput << rightOperand.numerator << "/" << rightOperand.denominator;
+    if(abs(rightOperand.numerator) > rightOperand.denominator){
+        leftOutput << rightOperand.numerator / rightOperand.denominator;
+        if(rightOperand.numerator % rightOperand.denominator != 0){
+            leftOutput << "+" << abs(rightOperand.numerator % rightOperand.denominator);
+            leftOutput << "/" << rightOperand.denominator;
+        }
+    } else {
+        leftOutput << rightOperand.numerator << "/" << rightOperand.denominator;
+    }
     return leftOutput;
 }
 
@@ -307,24 +327,7 @@ Fraction Fraction::operator--(int){
 
 
 
-/*
-void fraction::simplify() {
-    bool isNegative = fractionNegative();
-    int absNumerator = abs(numerator);
-    int smallestNum = (absNumerator < denominator)? absNumerator : denominator;
-    while( smallestNum > 1 ){
-        if(absNumerator % smallestNum == 0 &&
-           denominator  % smallestNum == 0){
-            absNumerator /= smallestNum;
-            denominator /= smallestNum;
-        }
-        smallestNum--;
-    }
-    numerator = (isNegative)? absNumerator * -1 : absNumerator;
-}
- */
 
-//Assume that ONLY the numerator could be negative
 void Fraction::simplify(Fraction& original){
     int absNumerator = std::abs(original.numerator);
     int smallestNum = (absNumerator < original.denominator)? absNumerator : original.denominator;
@@ -345,10 +348,16 @@ void Fraction::simplify(Fraction& original){
 
 
 
+
+
+
+
+
+
 int main()
 {
     Fraction f1(-9,3);
-    Fraction f2(5, 45);
+    Fraction f2(-95, 45);
     cout << f1 << endl;
     cout << f2 << endl;
 }
