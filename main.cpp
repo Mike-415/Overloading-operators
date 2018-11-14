@@ -1,20 +1,27 @@
 #include <iostream>
+#include <fstream>
 #include <cassert>
 #include <stdexcept>
 #include <string>
 using namespace std;
 
 class Fraction {
+
 public:
+
     Fraction( int inNumerator = 0, int inDenominator = 1);
+
     enum RelationalOperators{
         LESS_THAN, GREATER_THAN, LESS_THAN_OR_EQUAL, GREATER_THAN_OR_EQUAL, EQUAL, NOT_EQUAL
     };
+
     enum ArithmeticOperators{
         ADD, SUBTRACT
     };
+
     friend std::ostream& operator<<(std::ostream& leftOS, const Fraction& rightOperand);
     friend std::istream& operator>>(std::istream& leftIS, Fraction& rightOperand);
+
     friend bool operator<(const Fraction& leftOperand, const Fraction& rightOperand);
     friend bool operator>(const Fraction& leftOperand, const Fraction& rightOperand);
     friend bool operator<=(const Fraction& leftOperand, const Fraction& rightOperand);
@@ -36,12 +43,15 @@ public:
     Fraction operator++(int);
     Fraction operator--();
     Fraction operator--(int);
+
 private:
+
     int numerator;
     int denominator;
     friend bool compareFractions(const Fraction& leftOperand, const Fraction& rightOperand, RelationalOperators type);
     friend Fraction addOrSubtract(const Fraction& leftOperand, const Fraction& rightOperand, ArithmeticOperators type);
     void simplify(Fraction& fraction);
+    //friend void simplify2(Fraction& fraction);
 };
 
 
@@ -70,21 +80,24 @@ are printed as mixed numbers. Whole numbers should print without a denominator
 Improper Fractions should be printed as a mixed number with a + sign
 between the two parts (2+1/2). Negative Fractions should be printed
 with a leading minus sign.
-
-
-
  */
-std::ostream& operator<<(std::ostream& leftOutput, const Fraction& rightOperand) {
-    if(abs(rightOperand.numerator) > rightOperand.denominator){
-        leftOutput << rightOperand.numerator / rightOperand.denominator;
+std::ostream& operator<<(std::ostream& leftOS, const Fraction& rightOperand) {
+    //cout << "\n\tog: "<< rightOperand.numerator << "/" << rightOperand.denominator << endl;
+    if(abs(rightOperand.numerator) > abs(rightOperand.denominator)) {
+        leftOS << rightOperand.numerator / rightOperand.denominator;
         if(rightOperand.numerator % rightOperand.denominator != 0){
-            leftOutput << "+" << abs(rightOperand.numerator % rightOperand.denominator);
-            leftOutput << "/" << rightOperand.denominator;
+            leftOS << "+" << abs(rightOperand.numerator % rightOperand.denominator);
+            leftOS << "/" << rightOperand.denominator;
         }
     } else {
-        leftOutput << rightOperand.numerator << "/" << rightOperand.denominator;
+        if(rightOperand.denominator == 1){
+            leftOS << rightOperand.numerator;
+        } else {
+            leftOS << rightOperand.numerator << "/" << rightOperand.denominator;
+        }
+
     }
-    return leftOutput;
+    return leftOS;
 }
 
 
@@ -155,14 +168,14 @@ is to modify the right operand.
 std::istream& operator>>(std::istream& leftIS, Fraction& rightOperand){
     int firstPortion, secondPortion, thirdPortion;
     leftIS >> firstPortion;
-    cout << "firstPortion: " << firstPortion << endl;
+    //cout << "firstPortion: " << firstPortion << endl;
     if (leftIS.peek() == '+'){
         leftIS.ignore();
         leftIS >> secondPortion; //Numerator
         leftIS.ignore();
         leftIS >> thirdPortion;  //Denominator
-        cout << "secondPortion: " << secondPortion << endl;
-        cout << "thirdPortion: " << thirdPortion << endl;
+        //cout << "secondPortion: " << secondPortion << endl;
+        //cout << "thirdPortion: " << thirdPortion << endl;
 
         firstPortion = thirdPortion * firstPortion;
         firstPortion += (firstPortion > 0)? secondPortion : -secondPortion;
@@ -176,8 +189,8 @@ std::istream& operator>>(std::istream& leftIS, Fraction& rightOperand){
         //doThirdOption
         secondPortion = 1;
     }
+    //cout << "first: " << firstPortion << "second: " << secondPortion << endl;
     Fraction temp(firstPortion, secondPortion);
-    cout << "temp: " << temp.numerator << "/" << temp.denominator << endl;
     rightOperand = temp;
     return leftIS;
 }
@@ -306,8 +319,8 @@ Fraction operator-(const Fraction& leftOperand, const Fraction& rightOperand){
 Fraction operator*(const Fraction& leftOperand, const Fraction& rightOperand){
     int newNumerator = leftOperand.numerator * rightOperand.numerator;
     int newDenominator = leftOperand.denominator * rightOperand.denominator;
-    Fraction product(newNumerator, newDenominator);
-    return product;
+    Fraction *product = new Fraction(newNumerator, newDenominator);
+    return *product;
 }
 
 
@@ -318,8 +331,8 @@ Fraction operator*(const Fraction& leftOperand, const Fraction& rightOperand){
 Fraction operator/(const Fraction& leftOperand, const Fraction& rightOperand){
     int newNumerator = leftOperand.numerator * rightOperand.denominator;
     int newDenominator = leftOperand.denominator * rightOperand.numerator;
-    Fraction quotient(newNumerator, newDenominator);
-    return quotient;
+    Fraction *quotient = new Fraction(newNumerator, newDenominator);
+    return *quotient;
 }
 
 
@@ -328,8 +341,8 @@ Fraction operator/(const Fraction& leftOperand, const Fraction& rightOperand){
 
 
 Fraction Fraction::operator+=(const Fraction& rightOperand){
-
     *this = *this + rightOperand;
+    simplify(*this);
     return *this;
 }
 
@@ -339,8 +352,8 @@ Fraction Fraction::operator+=(const Fraction& rightOperand){
 
 
 Fraction Fraction::operator-=(const Fraction& rightOperand){
-
     *this = *this - rightOperand;
+    simplify(*this);
     return *this;
 }
 
@@ -350,8 +363,8 @@ Fraction Fraction::operator-=(const Fraction& rightOperand){
 
 
 Fraction Fraction::operator*=(const Fraction& rightOperand){
-
     *this = *this * rightOperand;
+    simplify(*this);
     return *this;
 }
 
@@ -363,6 +376,7 @@ Fraction Fraction::operator*=(const Fraction& rightOperand){
 Fraction Fraction::operator/=(const Fraction& rightOperand){
 
     *this = *this / rightOperand;
+    simplify(*this);
     return *this;
 }
 
@@ -375,6 +389,7 @@ Fraction Fraction::operator/=(const Fraction& rightOperand){
 Fraction Fraction::operator++(){
     Fraction one(1);
     *this =  addOrSubtract(*this, one, Fraction::ADD);
+    simplify(*this);
     return *this;
 }
 
@@ -388,6 +403,7 @@ Fraction Fraction::operator++(int){
     incrementedFraction = addOrSubtract(*this, one, Fraction::ADD);
     denominator = incrementedFraction.denominator;
     numerator = incrementedFraction.numerator;
+    simplify(*this);
     return temp;
 }
 
@@ -400,6 +416,7 @@ Fraction Fraction::operator++(int){
 Fraction Fraction::operator--(){
     Fraction one(1,1);
     *this = addOrSubtract(*this, one, Fraction::SUBTRACT);
+    simplify(*this);
     return *this;
 }
 
@@ -413,6 +430,7 @@ Fraction Fraction::operator--(int){
     decrementedFraction = addOrSubtract(*this, one, Fraction::SUBTRACT);
     denominator = decrementedFraction.denominator;
     numerator = decrementedFraction.numerator;
+    simplify(*this);
     return temp;
 }
 
@@ -420,16 +438,28 @@ Fraction Fraction::operator--(int){
 
 
 
+//The best way to do this is to make the function a
+//void function with no parameters that
+// reduces the calling object.
 
+//Your simplify() function should also ensure that
+//the denominator is never negative.
+//If the denominator is negative,
+//fix this by multiplying numerator and denominator by -1.
+//Also, if the numerator is 0, the denominator should be set to 1.
 
 void Fraction::simplify(Fraction& fraction){
-    int absNumerator = std::abs(fraction.numerator);
-    int smallestValue = (absNumerator < fraction.denominator)? absNumerator : fraction.denominator;
-    while( smallestValue > 1 ){
-        if(absNumerator % smallestValue == 0 &&
-           fraction.denominator  % smallestValue == 0){
+    if(fraction.numerator == 0){
+        fraction.denominator = 1;
+    }
+
+    int smallestValue = ( std::abs(fraction.numerator) < fraction.denominator)? abs(fraction.numerator) : fraction.denominator;
+    while( smallestValue > 1 && fraction.numerator != 1 && fraction.denominator != 1){
+        if(abs(fraction.numerator) % smallestValue == 0 && fraction.denominator  % smallestValue == 0){
+            //cout << "absNum: "  << "fractDen: " << fraction.denominator << "small: " << smallestValue << endl;
             fraction.numerator /= smallestValue;
             fraction.denominator /= smallestValue;
+            //cout << "num: " << fraction.numerator << " den: " << fraction.denominator << endl;
         }
         smallestValue--;
     }
@@ -452,18 +482,208 @@ void Fraction::simplify(Fraction& fraction){
 
 
 
+//TODO: Test with the code you were given
+//TODO: Relearn about namespace
+//TODO: Relearn about separating files
+
+
+void BasicTest();
+void RelationTest();
+void BinaryMathTest();
+void MathAssignTest();
+bool eof(ifstream& in);
+string boolString(bool convertMe);
+
+
+//TODO: Reread the rubric about the 'simplify' method
+//TODO:
 int main()
 {
-    Fraction f1(-9,3);
-    Fraction f2(-95, 45);
-    Fraction f3;
-    cout << f1 << endl;
-    cout << f2 << endl;
-    cin >> f3;
-    cout << "main: f3 = " << f3 << endl;
 
+    //BasicTest();
+    //RelationTest();
+    BinaryMathTest();
+    MathAssignTest();
 }
 
+
+
+
+
+void BasicTest()
+{
+    cout << "\n----- Testing basic Fraction creation & printing\n";
+    cout << "(Fractions should be in reduced form, and as mixed numbers.)\n";
+
+    const Fraction fr[] = {Fraction(4, 8),
+                           Fraction(-15,21),
+                           Fraction(10),
+                           Fraction(12, -3),
+                           Fraction(),
+                           Fraction(28, 6),
+                           Fraction(0, 12)};
+
+    for (int i = 0; i < 7; i++){
+        cout << "Fraction [" << i <<"] = " << fr[i] << endl;
+    }
+
+
+    cout << "\n----- Now reading Fractions from file\n";
+    ifstream in("Fraction.txt");
+    assert(in);
+    while (!eof(in)) {
+        Fraction f;
+        if (in.peek() == '#') {
+            in.ignore(128, '\n');                       //skip this line, it's a comment
+        } else {
+            in >> f;
+            cout << "Read Fraction = " << f << endl;
+        }
+    }
+}
+
+
+bool eof(ifstream& in)
+{
+    char ch;
+    in >> ch;
+    in.putback(ch);
+    return !in;
+}
+
+
+
+
+
+string boolString(bool convertMe) {
+    if (convertMe) {
+        return "true";
+    } else {
+        return "false";
+    }
+}
+
+
+void RelationTest()
+{
+    cout << "\n----- Testing relational operators between Fractions\n";
+
+    const Fraction fr[] =  {Fraction(3, 6), Fraction(1,2), Fraction(-15,30),
+                            Fraction(1,10), Fraction(0,1), Fraction(0,2)};
+
+    for (int i = 0; i < 5; i++) {
+        cout << "Comparing " << fr[i] << " to " << fr[i+1] << endl;
+        cout << "\tIs left < right? " << boolString(fr[i] < fr[i+1]) << endl;
+        cout << "\tIs left <= right? " << boolString(fr[i] <= fr[i+1]) << endl;
+        cout << "\tIs left > right? " << boolString(fr[i] > fr[i+1]) << endl;
+        cout << "\tIs left >= right? " << boolString(fr[i] >= fr[i+1]) << endl;
+        cout << "\tDoes left == right? " << boolString(fr[i] == fr[i+1]) << endl;
+        cout << "\tDoes left != right ? " << boolString(fr[i] != fr[i+1]) << endl;
+    }
+
+    cout << "\n----- Testing relations between Fractions and integers\n";
+    Fraction f(-3,6);
+    int num = 2;
+    cout << "Comparing " << f << " to " << num << endl;
+    cout << "\tIs left < right? " << boolString(f < num) << endl;
+    cout << "\tIs left <= right? " << boolString(f <= num) << endl;
+    cout << "\tIs left > right? " << boolString(f > num) << endl;
+    cout << "\tIs left >= right? " << boolString(f >= num) << endl;
+    cout << "\tDoes left == right? " << boolString(f == num) << endl;
+    cout << "\tDoes left != right ? " << boolString(f != num) << endl;
+
+    Fraction g(1,4);
+    num = -3;
+    cout << "Comparing " << num << " to " << g << endl;
+    cout << "\tIs left < right? " << boolString(num < g) << endl;
+    cout << "\tIs left <= right? " << boolString(num <= g) << endl;
+    cout << "\tIs left > right? " << boolString(num > g) << endl;
+    cout << "\tIs left >= right? " << boolString(num >= g) << endl;
+    cout << "\tDoes left == right? " << boolString(num == g) << endl;
+    cout << "\tDoes left != right ? " << boolString(num != g) << endl;
+}
+
+
+
+
+
+void BinaryMathTest()
+{
+    cout << "\n----- Testing binary arithmetic between Fractions\n";
+
+    const Fraction fr[] = {Fraction(1, 6), Fraction(1,3),
+                           Fraction(-2,3), Fraction(5), Fraction(-4,3)};
+
+    for (int i = 0; i < 4; i++) {
+        cout << fr[i] << " + " << fr[i+1] << " = " << fr[i] + fr[i+1] << endl;
+        cout << fr[i] << " - " << fr[i+1] << " = " << fr[i] - fr[i+1] << endl;
+        cout << fr[i] << " * " << fr[i+1] << " = " << fr[i] * fr[i+1] << endl;
+        cout << fr[i] << " / " << fr[i+1] << " = " << fr[i] / fr[i+1] << endl;
+    }
+
+    cout << "\n----- Testing arithmetic between Fractions and integers\n";
+    Fraction f(-1, 2);
+    int num = 4;
+    cout << f << " + " << num << " = " << f + num << endl;
+    cout << f << " - " << num << " = " << f - num << endl;
+    cout << f << " * " << num << " = " << f * num << endl;
+    cout << f << " / " << num << " = " << f / num << endl;
+
+    Fraction g(-1, 2);
+    num = 3;
+    cout << num << " + " << g << " = " << num + g << endl;
+    cout << num << " - " << g << " = " << num - g << endl;
+    cout << num << " * " << g << " = " << num * g << endl;
+    cout << num << " / " << g << " = " << num / g << endl;
+}
+
+
+
+
+
+
+void MathAssignTest()
+{
+    cout << "\n----- Testing shorthand arithmetic assignment on Fractions\n";
+
+    Fraction fr[] = {Fraction(1, 6), Fraction(4),
+                     Fraction(-1,2), Fraction(5)};
+
+    for (int i = 0; i < 3; i++) {
+        cout << fr[i] << " += " << fr[i+1] << " = ";
+        cout << (fr[i] += fr[i+1]) << endl;
+        cout << fr[i] << " -= " << fr[i+1] << " = ";
+        cout << (fr[i] -= fr[i+1]) << endl;
+        cout << fr[i] << " *= " << fr[i+1] << " = ";
+        cout << (fr[i] *= fr[i+1]) << endl;
+        cout << fr[i] << " /= " << fr[i+1] << " = ";
+        cout << (fr[i] /= fr[i+1]) << endl;
+    }
+
+    cout << "\n----- Testing shorthand arithmetic assignment using integers\n";
+    Fraction f(-1, 3);
+    int num = 3;
+    cout << f << " += " << num << " = ";
+    cout << (f += num) << endl;
+    cout << f << " -= " << num << " = ";
+    cout << (f -= num) << endl;
+    cout << f << " *= " << num << " = ";
+    cout << (f *= num) << endl;
+    cout << f << " /= " << num << " = ";
+    cout << (f /= num) << endl;
+
+    cout << "\n----- Testing increment/decrement prefix and postfix\n";
+    Fraction g(-1, 3);
+    cout << "Now g = " << g << endl;
+    cout << "g++ = " << g++ << endl;
+    cout << "Now g = " << g << endl;
+    cout << "++g = " << ++g << endl;
+    cout << "Now g = " << g << endl;
+    cout << "g-- = " << g-- << endl;
+    cout << "Now g = " << g << endl;
+    cout << "--g = " << --g << endl;
+    cout << "Now g = " << g << endl;
+}
 
 
 /*
