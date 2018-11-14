@@ -50,7 +50,8 @@ private:
     int denominator;
     friend bool compareFractions(const Fraction& leftOperand, const Fraction& rightOperand, RelationalOperators type);
     friend Fraction addOrSubtract(const Fraction& leftOperand, const Fraction& rightOperand, ArithmeticOperators type);
-    void simplify(Fraction& fraction);
+    void simplify();
+    void correction();
     //friend void simplify2(Fraction& fraction);
 };
 
@@ -64,7 +65,7 @@ Fraction::Fraction( int inNumerator, int inDenominator){
     assert(inDenominator != 0);
     numerator = inNumerator;
     denominator = inDenominator;
-    simplify(*this);
+    this->simplify();
 }
 
 
@@ -292,6 +293,7 @@ Fraction addOrSubtract(const Fraction& leftOperand, const Fraction& rightOperand
     }
     int newDenominator = leftOperand.denominator * rightOperand.denominator;
     Fraction result(newNumerator, newDenominator);
+    result.simplify();
     return result;
 }
 
@@ -320,6 +322,7 @@ Fraction operator*(const Fraction& leftOperand, const Fraction& rightOperand){
     int newNumerator = leftOperand.numerator * rightOperand.numerator;
     int newDenominator = leftOperand.denominator * rightOperand.denominator;
     Fraction *product = new Fraction(newNumerator, newDenominator);
+    product->simplify();
     return *product;
 }
 
@@ -332,6 +335,7 @@ Fraction operator/(const Fraction& leftOperand, const Fraction& rightOperand){
     int newNumerator = leftOperand.numerator * rightOperand.denominator;
     int newDenominator = leftOperand.denominator * rightOperand.numerator;
     Fraction *quotient = new Fraction(newNumerator, newDenominator);
+    quotient->simplify();
     return *quotient;
 }
 
@@ -342,7 +346,7 @@ Fraction operator/(const Fraction& leftOperand, const Fraction& rightOperand){
 
 Fraction Fraction::operator+=(const Fraction& rightOperand){
     *this = *this + rightOperand;
-    simplify(*this);
+    this->simplify();
     return *this;
 }
 
@@ -353,7 +357,7 @@ Fraction Fraction::operator+=(const Fraction& rightOperand){
 
 Fraction Fraction::operator-=(const Fraction& rightOperand){
     *this = *this - rightOperand;
-    simplify(*this);
+    this->simplify();
     return *this;
 }
 
@@ -364,7 +368,7 @@ Fraction Fraction::operator-=(const Fraction& rightOperand){
 
 Fraction Fraction::operator*=(const Fraction& rightOperand){
     *this = *this * rightOperand;
-    simplify(*this);
+    this->simplify();
     return *this;
 }
 
@@ -376,7 +380,7 @@ Fraction Fraction::operator*=(const Fraction& rightOperand){
 Fraction Fraction::operator/=(const Fraction& rightOperand){
 
     *this = *this / rightOperand;
-    simplify(*this);
+    this->simplify();
     return *this;
 }
 
@@ -389,7 +393,7 @@ Fraction Fraction::operator/=(const Fraction& rightOperand){
 Fraction Fraction::operator++(){
     Fraction one(1);
     *this =  addOrSubtract(*this, one, Fraction::ADD);
-    simplify(*this);
+    this->simplify();
     return *this;
 }
 
@@ -403,7 +407,7 @@ Fraction Fraction::operator++(int){
     incrementedFraction = addOrSubtract(*this, one, Fraction::ADD);
     denominator = incrementedFraction.denominator;
     numerator = incrementedFraction.numerator;
-    simplify(*this);
+    this->simplify();
     return temp;
 }
 
@@ -416,7 +420,7 @@ Fraction Fraction::operator++(int){
 Fraction Fraction::operator--(){
     Fraction one(1,1);
     *this = addOrSubtract(*this, one, Fraction::SUBTRACT);
-    simplify(*this);
+    this->simplify();
     return *this;
 }
 
@@ -430,7 +434,7 @@ Fraction Fraction::operator--(int){
     decrementedFraction = addOrSubtract(*this, one, Fraction::SUBTRACT);
     denominator = decrementedFraction.denominator;
     numerator = decrementedFraction.numerator;
-    simplify(*this);
+    this->simplify();
     return temp;
 }
 
@@ -448,17 +452,14 @@ Fraction Fraction::operator--(int){
 //fix this by multiplying numerator and denominator by -1.
 //Also, if the numerator is 0, the denominator should be set to 1.
 
-void Fraction::simplify(Fraction& fraction){
-    if(fraction.numerator == 0){
-        fraction.denominator = 1;
-    }
-
-    int smallestValue = ( std::abs(fraction.numerator) < fraction.denominator)? abs(fraction.numerator) : fraction.denominator;
-    while( smallestValue > 1 && fraction.numerator != 1 && fraction.denominator != 1){
-        if(abs(fraction.numerator) % smallestValue == 0 && fraction.denominator  % smallestValue == 0){
+void Fraction::simplify(){
+    this->correction();
+    int smallestValue = ( abs(this->numerator) < abs(this->denominator))? abs(this->numerator) : this->denominator;
+    while( smallestValue > 1 && this->numerator != 1 && this->denominator != 1){
+        if(abs(this->numerator) % smallestValue == 0 && this->denominator  % smallestValue == 0){
             //cout << "absNum: "  << "fractDen: " << fraction.denominator << "small: " << smallestValue << endl;
-            fraction.numerator /= smallestValue;
-            fraction.denominator /= smallestValue;
+            this->numerator /= smallestValue;
+            this->denominator /= smallestValue;
             //cout << "num: " << fraction.numerator << " den: " << fraction.denominator << endl;
         }
         smallestValue--;
@@ -470,6 +471,16 @@ void Fraction::simplify(Fraction& fraction){
 
 
 
+void Fraction::correction(){
+    if(this->numerator == 0){
+        this->denominator = 1;
+    }
+    // +/- OR -/-
+    if((this->numerator > 0 || this->numerator < 0) && this->denominator < 0){
+        this->numerator *= -1;
+        this->denominator *= -1;
+    }
+}
 //You need to figure out a way to solve the >> operator problem
 //1. Review the readings to see what's different in the function signature
 //2. Look at the rubric so you can use the pre-defined if/else statement
@@ -499,9 +510,8 @@ string boolString(bool convertMe);
 //TODO:
 int main()
 {
-
-    //BasicTest();
-    //RelationTest();
+    BasicTest();
+    RelationTest();
     BinaryMathTest();
     MathAssignTest();
 }
