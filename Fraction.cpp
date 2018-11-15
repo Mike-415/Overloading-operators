@@ -1,3 +1,10 @@
+/*
+ The Fraction class contains two data members: numerator and denominator
+ These data members are used to do various operations such as arithmetic and relational comparisons
+ After initialization or any operations that may change the numerator or denominator,
+ the Fraction object will always be simplified.
+ */
+
 #include "Fraction.h"
 
 namespace cs_fraction {
@@ -166,6 +173,8 @@ namespace cs_fraction {
 
 
 
+
+
     Fraction operator+(const Fraction& leftOperand, const Fraction& rightOperand){
         return addOrSubtract(leftOperand, rightOperand, Fraction::ADD);
     }
@@ -309,6 +318,9 @@ namespace cs_fraction {
 
 
 
+    /**
+     * Post: Reduces the fraction to it's lowest terms
+     */
     void Fraction::simplify(){
         this->correction(); //This function esolves fraction edge cases prior to simplification
         int smallestValue = ( abs(this->numerator) < abs(this->denominator))? abs(this->numerator) : this->denominator;
@@ -326,6 +338,11 @@ namespace cs_fraction {
 
 
 
+    /**
+     * Post: Ensures that any fraction with a numerator of zero will have a denominator of one.
+     *       If the value is negative, the numerator will be the only data member that is negative.
+     *       If both the numerator and denominator are negative, they both become positive
+     */
     void Fraction::correction(){
         if(this->numerator == 0){
             this->denominator = 1;
