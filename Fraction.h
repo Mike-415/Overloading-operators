@@ -1,3 +1,89 @@
+/*
+    Name:       Michael Gonzalez
+    Class:      cs110b
+    Instructor: Dave Harden
+    File:       Fraction.h
+
+    The fraction class can be used to create objects that store a numerator and a denominator.
+    This class can perform various arithmetic operations on other fraction through overloaded operators.
+    The following functions are available:
+
+    fraction(int inNumerator = 0, int inDenominator = 1);
+      pre:  The client provides appropriate arguments to the constructor  (0-2).
+            If the client uses the two-argument constructor, they must ensure
+            that the denominator is not one.
+      post: The calling object has been created and initialized according to the number of arguments that
+            are provided to the constructor.
+
+    friend std::ostream& operator<<(std::ostream& leftOS, const Fraction& rightOperand);
+      post: Returns an output stream that contains either
+            a regular fraction ( <numerator> / <denominator> )
+            or a mixed number  ( <whole number> + <numerator> / <denominator> )
+
+    friend std::istream& operator>>(std::istream& leftIS, Fraction& rightOperand);
+      post: Returns an input stream and updates the right operand with the user's input via the console
+
+
+    friend bool operator<(const Fraction& leftOperand, const Fraction& rightOperand);
+      post: Returns true if the left operand is less than to the right operand.
+
+    friend bool operator>(const Fraction& leftOperand, const Fraction& rightOperand);
+      post: Returns true if the left operand is greater than to the right operand.
+
+    friend bool operator<=(const Fraction& leftOperand, const Fraction& rightOperand);
+      post: Returns true if the left operand is less than or equal to the right operand.
+
+    friend bool operator>=(const Fraction& leftOperand, const Fraction& rightOperand);
+      post: Returns true if the left operand is greater than or equal to the right operand.
+
+    friend bool operator!=(const Fraction& leftOperand, const Fraction& rightOperand);
+      post: Returns true if the left operand is not equal to the right operand.
+
+    friend bool operator==(const Fraction& leftOperand, const Fraction& rightOperand);
+      post: Returns true if the left operand is equal to the right operand.
+
+
+    friend Fraction operator+(const Fraction& leftOperand, const Fraction& rightOperand);
+      post: Returns the simplified sum of the left and right operands
+
+    friend Fraction operator-(const Fraction& leftOperand, const Fraction& rightOperand);
+      post: Returns the simplified difference of the left and right operands
+
+    friend Fraction operator*(const Fraction& leftOperand, const Fraction& rightOperand);
+      post: Returns the simplified product of the left and right operands
+
+    friend Fraction operator/(const Fraction& leftOperand, const Fraction& rightOperand);
+      post: Returns the simplified quotient of the left and right operands
+
+
+    Fraction operator+=(const Fraction& rightOperand);
+      post: Returns the simplified sum of the calling object and right operand
+
+    Fraction operator-=(const Fraction& rightOperand);
+      post: Returns the simplified difference of the calling object and right operand
+
+    Fraction operator*=(const Fraction& rightOperand);
+      post: Returns the simplified product of the calling object and right operand
+
+    Fraction operator/=(const Fraction& rightOperand);
+      post: Returns the simplified quotient of the calling object and right operand
+
+
+    Fraction operator++();
+      post: First the calling object is incremented, then it's returned
+
+    Fraction operator++(int);
+      post: First a fraction with the same data members as the calling object is created, then the
+            calling object is incremented, then the original fraction is returned
+
+    Fraction operator--();
+      post: First the calling object is decremented, then it's returned
+
+    Fraction operator--(int);
+      post: First a fraction with the same data members as the calling object is created, then the
+            calling object is decremented, then the original fraction is returned
+*/
+
 #include <iostream>
 #ifndef FRACTION_H
 #define FRACTION_H
